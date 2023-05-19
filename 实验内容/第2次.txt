@@ -1,0 +1,35 @@
+6351276165
+execute dbms_connection_pool. alter_param('','incrsize','9');      //自动扩展连接池增加进程数设置为
+execute dbms_connection_pool. alter_param('','Inactivity_timeout','480');    //空闲超时（量纲为秒）设置为
+execute dbms_connection_pool. alter_param('','Max_use_session','600');    // 会话基于使用的最长时间（量纲为分钟）设置为
+
+execute dbms_connection_pool. alter_param('','minsize',9);     //初始连接池进程数
+execute dbms_connection_pool. alter_param('','max_think_time','600');  //会话建立后发出任务前最长等待时间s
+execute dbms_connection_pool. alter_param('','max_lifetime_session','840');   //会话最长时间（秒）
+
+ conn system@s_t747001
+select connection_pool,status from dba_cpool_info;
+execute dbms_connection_pool.start_pool;
+
+alter system set dispatchers='(prot=tcp)(disp=2)(serv=T121375)';         //可服务的共享用户数为
+alter system set dispatchers='(prot=tcp)(disp=1)(serv=T647001)';
+alter system set dispatchers='(prot=tcp)(disp=2)(serv=T747001)';
+
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1525)))';
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1525)))';
+alter system set max_dispatchers=6;     //最大调度进程数设置为
+alter system set shared_servers=4;     //初始运行的共享服务器进程数设置为
+alter system set shared_server_sessions=1020;    //最大共享服务器会话数设置为
+
+set oracle_sid=T747001
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+conn system@s_t647001      //建立会话数
+conn system@s_t747001 
+
+
+conn system@s_t121375

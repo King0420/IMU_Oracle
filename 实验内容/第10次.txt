@@ -1,0 +1,330 @@
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+
+set oracle_sid=T747001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+切换用户 conn   system 647001
+
+
+col file_name for a75
+select * from dba_data_files;
+
+
+
+
+
+
+//T647001
+位置
+//                           //3,4
+alter system set db_create_file_dest='E:\ORACLE\AT647001E\';
+
+
+
+//                         //2,6
+alter system set db_create_file_dest='F:\ORACLE\AT647001G\';
+
+
+
+//第五个                                     //5
+
+alter system set db_create_file_dest='D:\ORACLE\AT647001A\';
+
+drop tablespace THI_504;
+
+
+alter system set db_4K_cache_size=2m;
+
+//确保记录不重复和不相同
+
+select * from RJEMP381;
+truncate table RJEMP381;
+
+select * from RJCOU742;
+truncate table RJCOU742;
+
+
+select * from RJPAR643;
+truncate table RJPAR643;
+
+select * from RJSTU304;
+delete from RJSTU304 where s_no='001';
+
+
+select * from RJDEPT365;
+delete from RJDEPT365 where dept_dno='19';
+//////////////////////////////////////////////////////////////////////////////////////////
+//创建3个表空间
+drop tablespace  ;
+
+create tablespace TAI_737 datafile size 60m  blocksize 4k;
+create tablespace TDI_502 datafile size 130m  blocksize 4k;
+create tablespace THI_504 datafile size 90m  blocksize 4k;
+
+//第二个
+drop index ind_RJCOU742_ctype;
+
+create index ind_RJCOU742_ctype on RJCOU742(ctype) tablespace TDI_502;
+
+
+Alter table RJCOU742 move mapping table;
+
+Alter table RJCOU742 move nomapping;
+
+create bitmap index ind_RJCOU742_ctype on RJCOU742(ctype) tablespace TDI_502;
+
+
+Create index ind_RJEMP381_eincome on RJEMP381(eincome)
+Global partition by range(eincome)
+(
+  partition par_RJEMP381_eincome_1 values less than (100) tablespace THI_504,
+  Partition par_RJEMP381_eincome_2 values less than(103) tablespace TAI_737,
+  Partition par_RJEMP381_eincome_3 values less than (maxvalue) tablespace TDI_502
+);
+
+
+select * from user_tables;
+
+alter index ind_RJEMP381_eincome monitoring usage;
+
+alter index ind_RJEMP381_eincome nomonitoring usage;
+
+select * from v$object_usage;
+
+select * from RJEMP381 where eincome>104;
+
+
+select * from user_tables where table_name like '%RJ%';
+
+//////////////////////////////////////////////////////////////////////////////////
+
+
+//确保记录不重复和不相同
+
+select * from RJSTU081;
+truncate table RJSTU081;
+
+select * from RJPAR082;
+truncate table RJPAR082;
+
+
+select * from RJEMP333;
+truncate table RJEMP333;
+
+select * from RJCOU234;
+delete from RJCOU234 where couno='001';
+
+
+select * from RJSPEC525;
+delete from RJSPEC525 where specspno='19';
+
+////////////////////////////////////////////////////
+
+T747001  第二次练习
+位置
+//     4，5,6                     
+alter system set db_create_file_dest='D:\ORACLE\DT747001\D1\';
+
+
+
+//  3              
+alter system set db_create_file_dest='E:\ORACLE\DT747001\D5\';
+
+
+
+//    2                                 
+
+alter system set db_create_file_dest='F:\ORACLE\DT747001\D9\';
+
+///////////////////////////////////////////////////
+//第一个
+drop tablespace  ;
+
+create tablespace TDI_846 datafile size 90m  blocksize 16k;
+create tablespace TGI_110 datafile size 140m  blocksize 16k;
+create tablespace TJI_744 datafile size 140m  blocksize 16k;
+
+//第二个   conn system/747001
+drop index stuleader_RJSTU081_i;
+
+create index ind_RJEMP333_emp_salary on RJEMP333(emp_salary) tablespace TDI_846;
+
+
+Alter table RJEMP333 move mapping table;
+
+Alter table RJEMP333 move nomapping;
+
+create bitmap index ind_RJEMP333_emp_salary on RJEMP333(emp_salary) tablespace TDI_846;
+
+//第三个
+Create index stuleader_RJSTU081_i on RJSTU081(stuleader)
+Global partition by hash(stuleader)
+(
+  partition stuleader_RJSTU081_1_p  tablespace TGI_110,
+  Partition stuleader_RJSTU081_2_p  tablespace TDI_846,
+  Partition stuleader_RJSTU081_3_p  tablespace TJI_744
+);
+
+
+Create bitmap index stuleader_RJSTU081_i on RJSTU081(stuleader) local
+(
+  partition stuno_RJSTU081_1_p  tablespace TGI_110,
+  Partition stuno_RJSTU081_2_p  tablespace TDI_846,
+  Partition stuno_RJSTU081_3_p  tablespace TJI_744
+);
+
+
+
+//第四个
+
+
+alter index ind_RJEMP333_emp_salary monitoring usage;
+
+
+select * from RJEMP333 where emp_salary>3;
+
+select * from v$object_usage;
+
+
+alter index ind_RJEMP333_emp_salary nomonitoring usage;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+select * from RJEMP531;
+truncate table RJEMP531;
+
+select * from RJCOU602;
+truncate table RJCOU602;
+
+
+select * from RJSTU023;
+truncate table RJSTU023;
+
+select * from RJPAR514;
+delete from RJPAR514 where pno='001';
+
+
+select * from RJSHOP425;
+delete from RJSHOP425 where w_wsno='19';
+
+////////////////////////////////////////////////////////////////////////
+conn system/121375
+
+位置
+//       4,6                 
+alter system set db_create_file_dest='D:\ORACLE\CT121375\DISKB\';
+
+
+//    2，3，5                
+alter system set db_create_file_dest='E:\ORACLE\CT121375\DISKE\';
+
+
+//                                     
+alter system set db_create_file_dest='F:\ORACLE\CT121375\DISKH\';
+
+///////////////////////////////////////////////////////////////////////////////////
+显示设置
+
+
+//第一个
+drop tablespace  ;
+
+create tablespace TCI_247 datafile size 60m  blocksize 2k;
+create tablespace TFI_044 datafile size 50m  blocksize 2k;
+create tablespace TKI_548 datafile size 130m  blocksize 2k;
+
+//第二个   conn system/121375
+drop index  ind_pname_RJPAR514;
+索引组织
+create index ind_pname_RJPAR514 on RJPAR514(pname) tablespace TFI_044;
+
+//////////////
+Alter table RJPAR514 move mapping table;
+
+create bitmap index ind_pname_RJPAR514 on RJPAR514(pname) tablespace TFI_044;
+
+//大对象
+create index ind_RJSTU023_stugrade on RJSTU023(stugrade) tablespace TDI_846;
+
+///////////////
+Alter table RJSTU023 move mapping table;
+
+create bitmap index ind_RJSTU023_stugrade on RJSTU023(stugrade) tablespace TDI_846;
+
+
+//第三个
+Create index ind_RJEMP531_eincome on RJEMP531(eincome)
+Global partition by range(eincome)
+(
+  partition par_RJEMP531_eincome_1 values less than (2200) tablespace THI_504,
+  Partition par_RJEMP531_eincome_2 values less than(3400) tablespace TAI_737,
+  Partition par_RJEMP531_eincome_3 values less than (maxvalue) tablespace TDI_502
+);
+
+
+Create bitmap index ind_etype_RJEMP531 on RJEMP531(etype) local
+(
+  partition par_eincome_RJEMP531_1  tablespace TKI_548,
+  Partition par_eincome_RJEMP531_2  tablespace TCI_247,
+  Partition par_eincome_RJEMP531_3  tablespace TFI_044
+);
+
+
+
+//第四个
+
+分区表
+alter index  ind_etype_RJEMP531 monitoring usage;
+
+
+select * from RJEMP531 where etype='a';
+
+select * from v$object_usage;
+
+
+alter index ind_etype_RJEMP531 nomonitoring usage;
+
+索引组织表
+
+alter index ind_RJCOU602_cou_level monitoring usage;
+
+
+select * from RJCOU602 where cou_level>3;
+
+select * from v$object_usage;
+
+
+alter index ind_RJCOU602_cou_level nomonitoring usage;
+
+
+大对象
+
+alter index ind_RJSTU023_stugrade monitoring usage;
+
+
+select * from RJSTU023 where stugrade>101;
+
+select * from v$object_usage;
+
+
+alter index ind_RJSTU023_stugrade nomonitoring usage;
+
+
+
+
+
+
+
+
+

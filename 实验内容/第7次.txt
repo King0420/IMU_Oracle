@@ -1,0 +1,392 @@
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+
+
+//查表空间
+set line 3000
+show parameter sort
+select * from dba_tablespaces;
+
+
+//默认的（缺省的）表空间
+select * from  database_properties;
+col property_value for a50
+col property_name for a50
+col description for a200
+
+
+
+alter tablespace userdata offline;
+alter tablespace userdata online;
+
+
+select * from dba_data_files;
+col file_name for a65
+select * from v$logfile order by 1,4;
+
+alter database move datafile '' to ''; 
+alter database move datafile 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\USERS01.DBF' to 'F:\ORACLE\AT647001G\DA521.DBF';
+
+
+select * from dba_data_files;
+alter database datafile '' autoextend off;
+alter database datafile '' resize 120m;
+  
+alter database datafile '' autoextend on next 100k maxsize 100m;
+alter database datafile 'F:\ORACLE\AT647001G\DA521.DBF' autoextend on next 5600k maxsize 220m;
+
+
+drop tablespace TAT_GBD including contents and datafiles;
+
+
+//系统表空间 system
+//辅助表空间 
+
+
+
+//重新开始
+
+select * from dba_temp_files;
+create tablespace TA_738 datafile 'D:\ORACLE\AT647001A\BAEGE.DBF' size 120m;
+create tablespace TA_738 datafile '' size 120m;
+
+alter tablespace TA_738 add datafile '' size 110m;
+
+show parameter db_create
+
+
+alter system set db_create_file_dest='';
+
+create tablespace TD_152 datafile size 110m uniform size 82k;
+//
+alter system set db_8K_cache_size=2m;
+
+create tablespace TSA_40 datafile size 80m uniform size 224k blocksize 8k segment space management manual;
+
+alter database datafile '' autoextend on next 2640k maxsize 570m;
+
+//
+select * from dba_tablespaces;
+col file_name for a65
+select * from dba_data_files;
+
+//第二个
+
+show parameter db_create
+
+alter system set db_create_file_dest='';
+
+create bigfile tablespace TD_152 datafile size 110m uniform size 82k;
+
+
+//
+
+
+
+//第四个
+
+show parameter db_create
+
+alter system set db_create_file_dest='';
+
+alter system set db_16K_cache_size=2m;
+
+create bigfile tablespace TSA_077 datafile size 90m uniform size 576k blocksize 16k;
+
+segment space management auto
+extent management local  uniform size
+
+//第五个
+
+
+alter system set db_4K_cache_size=2m;
+
+create bigfile tablespace  datafile size 100m uniform size 188k blocksize 4k;
+
+
+//第六个
+
+alter system set db_4K_cache_size=2m;
+
+create  tablespace TSA_6  datafile size 140m autoextend on next 37m maxsize 900m uniform size 188k blocksize 4k;
+
+
+
+
+//t747001总结
+//系统表
+alter system set db_create_file_dest='D:\ORACLE\DT747001\D1\';
+
+//辅助表
+alter system set db_create_file_dest='E:\ORACLE\DT747001\D5\';
+
+//还原表
+alter system set db_create_file_dest='F:\ORACLE\DT747001\D9\';
+
+//临时表
+
+alter system set db_create_file_dest='E:\ORACLE\DT747001\D5\';
+
+//缺省的永久表空间
+
+alter system set db_create_file_dest='D:\ORACLE\DT747001\D1\';
+
+
+
+//第一个
+segment space management manual;
+
+create tablespace TD_526 datafile 'E:\ORACLE\DT747001\D5\BDGEC.BFD' size 70m uniform size 736k segment space management manual;
+
+
+drop tablespace TD_526 including contents and datafiles;
+
+alter tablespace TD_526 add datafile 'D:\ORACLE\DT747001\D1\BDAGBG.BFD' size 50m autoextend on next 20000k maxsize 710m;
+
+
+//第二个 
+
+create bigfile tablespace TG_057 datafile size 90m uniform size 640k;
+
+
+//第三个
+
+alter system set db_8K_cache_size=2m;
+修改错误
+show parameter pool
+show parameter  db_cache
+alter system set db_cache_size=50m;
+alter system set large_pool_size=50m;
+alter system set shared_pool_size=50m;
+
+select * from GV$SGA_DYNAMIC_COMPONENTS;
+
+create bigfile  tablespace TSD_61 datafile size 110m uniform size 184k blocksize 8k;
+
+
+//第四个
+
+alter system set db_4K_cache_size=2m;
+create  tablespace TSD_080  datafile size 100m autoextend on next 7440k  maxsize 420m uniform size 148k blocksize 4k;
+
+
+//第五个
+
+
+alter system set db_2K_cache_size=1;
+
+
+create  tablespace  TSD_3222 datafile size 120m autoextend on next 39m  maxsize 640m uniform size 70k blocksize 2k;
+
+
+//第六个
+
+alter system set db_8K_cache_size=1;
+
+create bigfile  tablespace TSD_0 datafile size 120m uniform size 176k blocksize 8k;
+
+
+
+
+///正式的一次121375
+
+//系统表
+alter system set db_create_file_dest='F:\ORACLE\CT121375\DISKH\';
+
+//辅助表
+alter system set db_create_file_dest='E:\ORACLE\CT121375\DISKE\';
+
+//还原表
+alter system set db_create_file_dest='E:\ORACLE\CT121375\DISKE\';
+
+//临时表
+
+alter system set db_create_file_dest='D:\ORACLE\CT121375\DISKB\';
+
+//缺省的永久表空间
+
+alter system set db_create_file_dest='D:\ORACLE\CT121375\DISKB\';
+
+
+drop tablespace  including contents and datafiles;
+
+
+//第一个
+
+create tablespace TC_360  datafile '' size m uniform size k segment space management manual;
+
+create tablespace  TC_360 datafile 'D:\ORACLE\CT121375\DISKB\BCGBG.FBD' size 130m uniform size 54k ;
+
+alter tablespace TC_360 add datafile 'E:\ORACLE\CT121375\DISKE\BCAFFC.FBD' size 140m autoextend on next 5480k maxsize 700m;
+
+
+
+//第二个
+
+
+create bigfile tablespace TF_843 datafile size 140m  autoextend on next 25m maxsize 620m uniform size 92k;
+autoextend on next 25m maxsize 620m 
+
+//第三个
+
+
+alter system set db_16K_cache_size=2m;
+
+
+create bigfile tablespace TSC_75  datafile size 80m autoextend on next 41m maxsize 450m uniform size 432k blocksize 16k;
+
+
+
+//第四个
+
+
+alter system set db_4K_cache_size=2m;
+
+
+create bigfile  tablespace TSC_563 datafile size 60m uniform size 196k blocksize 4k;
+
+
+
+//第五个
+
+
+alter system set db_8K_cache_size=2m;
+
+create bigfile  tablespace TSC_1850 datafile size 130m uniform size 184k blocksize 8k;
+
+
+//第六个
+
+
+alter system set db_4K_cache_size=2m;
+
+create bigfile tablespace TSC_5  datafile size 90m autoextend on next 9080k maxsize 880m uniform size 108k blocksize 4k;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	 2、创建第1个表空间（普通）,要求如下：
+		 1）①创建第1个表空间：
+		 2）①--- 表空间信息：
+		 3）①------- 表空间名命名为“TA_738”，
+		 4）①------- 存储内容为“永久对象”，
+		 5）①------- 块大小设置为“标准块”，
+		 6）①------- 表空间状态保持为“在线”，
+		 7）①------- 区管理方式为“本地”，
+		 8）①------- PCTUSED参数为“不起作用”，
+		 9）①------- 区大小(块数)设置为23；
+		10）①--- 文件信息：
+		11）①----⑴ 与临时表空间包含的文件放在一起，
+		12）①----⑴ 文件名命名为“BAEGE.DBF”，
+		13）①----⑴ 文件大小设置为120MB，
+		14）①----⑴ 文件自动扩展特性为“不支持”，
+		15）①向第1个表空间添加数据文件：
+		16）①----⑵ 与缺省的永久表空间包含的文件放在一起，
+		17）①----⑵ 文件名命名为“BACADB.DBF”，
+		18）①----⑵ 文件大小设置为110MB，
+		19）①----⑵ 自动扩展特性为“支持”，
+		20）①----⑵ 每次扩展量（块数）为650，
+		21）①----⑵ 最大扩展容量为680MB。
+	 3、创建第2个普通表空间（OMF机制）,要求如下：
+		 1）②创建第2个表空间：
+		 2）②--- 表空间信息：
+		 3）②------- 表空间名命名为“TD_152”，
+		 4）②------- 数据文件数设置为“只能有一个”；
+		 5）②------- 存储内容为“永久对象”，
+		 6）②------- 块大小设置为“标准块”，
+		 7）②------- 表空间状态保持为“在线”，
+		 8）②------- PCTUSED参数为“不起作用”，
+		 9）②------- 区大小(块数)设置为41；
+		10）②--- 文件信息：
+		11）②------- 存储位置与还原表空间包含的文件在同一文件夹下，
+		12）②------- 文件大小设置为110MB，
+		13）②------- 文件自动扩展特性为“不支持”。
+	 4、创建第3个表空间（非标准块大小，OMF机制）,要求如下：
+		 1）③创建第3个表空间：
+		 2）③--- 表空间信息：
+		 3）③------- 表空间名命名为“TSA_40”，
+		 4）③------- 数据文件数设置为“可以有多个”；
+		 5）③------- 存储内容为“永久对象”，
+		 6）③------- 块大小设置为8KB，
+		 7）③------- 表空间状态保持为“在线”，
+		 8）③------- 段空间管理方式为“手工”，
+		 9）③------- 区大小(块数)设置为28；
+		10）③--- 文件信息：
+		11）③------- 存储位置与辅助表空间包含的文件在同一文件夹下，
+		12）③------- 文件数为1；
+		13）③------- 文件大小设置为80MB，
+		14）③------- 文件自动扩展特性为“支持”，
+		15）③------- 每次扩展量（块数）为330，
+		16）③------- 文件最大扩展容量为570MB。
+	 5、创建第4个表空间（非标准块大小，OMF机制）,要求如下：
+		 1）④创建第4个表空间：
+		 2）④--- 表空间信息：
+		 3）④------- 表空间名命名为“TSA_077”，
+		 4）④------- 数据文件数设置为“只能有一个”；
+		 5）④------- 存储内容为“永久对象”，
+		 6）④------- 块大小为16KB，
+		 7）④------- 表空间状态保持为“在线”，
+		 8）④------- 段空间管理方式为“自动”，
+		 9）④------- 区大小(块数)设置为36；
+		10）④--- 文件信息：
+		11）④-------存储位置与系统表空间包含的文件在同一文件夹下，
+		12）④------- 文件数为1；
+		13）④------- 文件大小设置为90MB，
+		14）④------- 文件自动扩展特性为“不支持”。
+	 6、创建第5个表空间（非标准块大小，OMF机制）,要求如下：
+		 1）⑤创建第5个表空间：
+		 2）⑤--- 表空间信息：
+		 3）⑤------- 表空间名命名为“TSA_7277”，
+		 4）⑤------- 数据文件数设置为“只能有一个”；
+		 5）⑤------- 存储内容为“永久对象”，
+		 6）⑤------- 块大小设置为4KB，
+		 7）⑤------- 表空间状态保持为“在线”，
+		 8）⑤------- 段空间管理方式为“自动”，
+		 9）⑤------- 区大小(块数)设置为47；
+		10）⑤--- 文件信息：
+		11）⑤------- 存储位置与临时表空间包含的文件在同一文件夹下，
+		12）⑤------- 文件数为1；
+		13）⑤------- 文件大小设置为100MB，
+		14）⑤------- 文件自动扩展特性为“不支持”。
+	 7、创建第6个表空间（非标准块大小，OMF机制）,要求如下：
+		 1）⑥创建第6个表空间：
+		 2）⑥--- 表空间信息：
+		 3）⑥------- 表空间名命名为“TSA_6”，
+		 4）⑥------- 数据文件数设置为“可以有多个”；
+		 5）⑥------- 存储内容为“永久对象”，
+		 6）⑥------- 块大小设置为4KB，
+		 7）⑥------- 表空间状态保持为“在线”，
+		 8）⑥------- 段空间管理方式为“自动”，
+		 9）⑥------- 区大小(块数)设置为47；
+		10）⑥--- 文件信息：
+		11）⑥------- 存储位置与还原表空间包含的文件在同一文件夹下，
+		12）⑥------- 文件数为1；
+		13）⑥------- 文件大小设置为140MB，
+		14）⑥------- 文件自动扩展特性为“支持”，
+		15）⑥------- 每次扩展量（MB）为37，
+		16）⑥------- 文件最大扩展容量为900MB。

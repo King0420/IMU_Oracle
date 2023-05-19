@@ -1,0 +1,327 @@
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+切换用户 conn   system 647001
+
+10）字符集设置：
+		11）----数据库字符集为ZHS16GBK		12）----国家字符集为UTF8；
+//T647001
+
+缺省的永久表空间TA_BGD
+
+第一个表空间  TA_738
+
+第二个表空间  TD_152
+
+第三个表空间  TSA_40
+
+第四个表空间  TSA_077
+
+第五个表空间  TSA_7277
+
+第六个表空间  TSA_6
+
+select table_name,tablespace_name,row_movement,buffer_pool,ini_trans from user_tables
+
+drop table RJEMP381;
+
+lter table scott.emp2 enable row movement;
+
+//第一个
+create table RJEMP381
+(
+  eno char(6),
+  efname nvarchar2(10), 
+  etype char(16) default '编码',
+  eenter date default sysdate,
+  eincome number(9,0) default 1000,
+  emanager char(6),
+  edepart varchar2(24)
+)
+partition by range(eenter)
+( 
+  partition P_RJEMP381_1_eenter values less than (to_date('2011-02-01','yyyy-mm-dd')) tablespace TD_152 initrans 11,
+  partition P_RJEMP381_2_eenter values less than (to_date('2014-01-01','yyyy-mm-dd')) tablespace TA_BGD initrans 17,
+  partition P_RJEMP381_3_eenter values less than (maxvalue) tablespace TA_738 initrans 23
+);
+
+
+comment on table RJEMP381 is '员工表【分区表】';
+
+comment on column RJEMP381.eno is '员工号';
+
+comment on column RJEMP381.efname is '员工名';
+
+comment on column RJEMP381.etype is '工作类别';
+
+
+comment on column RJEMP381.eenter is '报到日期';
+
+
+comment on column RJEMP381.eincome is '薪水';
+
+
+comment on column RJEMP381.emanager is '上级主管';
+
+comment on column RJEMP381.edepart is '所属部门';
+
+
+select * from  RJEMP381;
+
+insert into RJEMP381 values('001','aaa','a',to_date('2010-06-01','yyyy-mm-dd'),100,'q','z');
+
+insert into RJEMP381 values('002','bbb','b',to_date('2010-06-02','yyyy-mm-dd'),101,'w','x');
+
+insert into RJEMP381 values('003','ccc','c',to_date('2013-05-02','yyyy-mm-dd'),102,'r','c');
+
+insert into RJEMP381 values('004','ddd','d',to_date('2013-04-02','yyyy-mm-dd'),103,'t','v');
+
+insert into RJEMP381 values('005','eee','e',to_date('2015-03-02','yyyy-mm-dd'),104,'y','s');
+
+insert into RJEMP381 values('006','fff','f',to_date('2015-09-02','yyyy-mm-dd'),105,'u','k');
+
+commit;
+
+analyze table RJEMP381 compute statistics;
+
+select table_name,partition_name,num_rows from dba_tab_partitions where table_name='RJEMP381';
+
+
+
+//第二个
+
+缺省的永久表空间TA_BGD
+
+第一个表空间  TA_738
+
+第二个表空间  TD_152
+
+第三个表空间  TSA_40
+
+第四个表空间  TSA_077
+
+第五个表空间  TSA_7277
+
+第六个表空间  TSA_6
+
+
+create table RJCOU742
+(
+  cno char(11),
+  cname varchar2(12), 
+  ctype varchar2(12) default '专业必修',
+  cmodify date default sysdate,
+  clevel number(1,0) default 2,
+  cbefore char(11),
+  cprof nvarchar2(12),
+  primary key (cno)
+)
+Organization index tablespace TA_738 initrans 28 overflow tablespace TSA_077 initrans 14;
+
+
+
+comment on table RJCOU742 is '课程表【索引组织的表】';
+
+comment on column RJCOU742.cno is '课程编号';
+
+comment on column RJCOU742.cname is '课程名称';
+
+comment on column RJCOU742.ctype is '课程种类';
+
+comment on column RJCOU742.cmodify is '修改时间';
+
+comment on column RJCOU742.clevel is '学分';
+
+comment on column RJCOU742.cbefore is '前序课程';
+
+comment on column RJCOU742.cprof is '所属专业';
+
+
+insert into RJCOU742 values('001','aaa','a',to_date('2010-06-01','yyyy-mm-dd'),1,'q','we');
+
+insert into RJCOU742 values('002','bbb','b',to_date('2015-09-02','yyyy-mm-dd'),2,'w','df');
+
+commit;
+
+analyze table RJCOU742 compute statistics;
+
+select table_name,num_rows from dba_tables where table_name='RJCOU742';
+
+
+//第三个
+drop table RJPAR643;
+
+create table RJPAR643
+(
+  parid char(12),
+  parpname varchar2(12), 
+  parkind nvarchar2(6) default '条状',
+  parfinish date default sysdate,
+  parnum number(8,0) default 200,
+  parsub char(12),
+  parplant varchar2(16),
+  parremark nclob,
+  parpic blob
+)
+tablespace TA_738
+Lob(parremark) store as parremark_lob(tablespace TSA_6),
+Lob(parpic) store as lob_parpic (tablespace TSA_6),
+initrans 8 storage (buffer_pool recycle);
+
+
+comment on table RJPAR643 is '零件表〈包含大对象字段的表〉';
+
+comment on column RJPAR643.parid is '件号';
+
+comment on column RJPAR643.parpname is '工件名';
+
+comment on column RJPAR643.parkind is '零件类别';
+
+comment on column RJPAR643.parfinish is '出厂日期';
+
+comment on column RJPAR643.parnum is '月生产量';
+
+comment on column RJPAR643.parsub is '构成零件';
+
+comment on column RJPAR643.parplant is '生产车间';
+
+comment on column RJPAR643.parremark is '零件备注';
+
+comment on column RJPAR643.parpic is '零件图片';
+
+
+insert into RJPAR643(parid,parpname,parkind,parfinish,parnum,parsub,parplant) values('001','aaa','a',to_date('2010-06-01','yyyy-mm-dd'),10,'q','wer');
+
+insert into RJPAR643(parid,parpname,parkind,parfinish,parnum,parsub,parplant) values('002','bbb','b',to_date('2015-06-08','yyyy-mm-dd'),20,'w','dfg');
+
+commit;
+
+analyze table RJPAR643 compute statistics;
+
+select table_name,num_rows from dba_tables where table_name='RJPAR643';
+
+
+//第四个
+
+Create cluster RJC_DB(s_deptno nvarchar2(9)) tablespace TSA_7277 initrans 7 storage (buffer_pool recycle);
+
+
+create table RJSTU304
+(
+  s_no char(11),
+  s_fname varchar2(18), 
+  s_from nchar(7) default '北京',
+  s_enter date default sysdate,
+  s_grade number(5,0) default 500,
+  s_monitor char(11),
+  s_deptno nvarchar2(9)
+) 
+cluster RJC_DB(s_deptno);
+
+
+comment on table RJSTU304 is '学生表【簇表1】';
+
+comment on column RJSTU304.s_no is '学号';
+
+comment on column RJSTU304.s_fname is '学生名';
+
+comment on column RJSTU304.s_from is '学生来源';
+
+comment on column RJSTU304.s_enter is '入学日期';
+
+comment on column RJSTU304.s_grade is '高考成绩';
+
+comment on column RJSTU304.s_monitor is '学习委员学号';
+
+comment on column RJSTU304.s_deptno is '系号';
+
+
+create index RJSTU304 on cluster RJC_DB;
+
+insert into RJSTU304 values('001','aaa','d',to_date('2010-06-01','yyyy-mm-dd'),10,'456','18');
+
+insert into RJSTU304 values('002','bbb','f',to_date('2012-03-01','yyyy-mm-dd'),20,'789','19');
+
+analyze table RJSTU304 compute statistics;
+
+select table_name,num_rows from dba_tables where table_name='RJSTU304';
+
+
+//第五个
+
+create table RJDEPT365
+(
+  dept_dno nvarchar2(9)，
+  dept_dname nchar(7)
+) 
+cluster RJC_DB(dept_dno);
+
+
+comment on table RJDEPT365 is '系表（簇表2）';
+
+comment on column RJDEPT365.dept_dno is '系编号';
+
+comment on column RJDEPT365.dept_dname is '所属系';
+
+
+insert into RJDEPT365(dept_dno,dept_dname) values('17','qq');
+
+insert into RJDEPT365(dept_dno,dept_dname) values('19','qw');
+
+analyze table RJDEPT365 compute statistics;
+
+select table_name,num_rows from dba_tables where table_name='RJDEPT365';
+
+//第六个
+
+
+create global temporary table RJCOU136 on commit preserve rows as select * from RJCOU742;
+
+comment on table RJCOU136 is '课程表（全局临时表）';
+
+comment on column RJCOU136.cno is '课程编号';
+
+comment on column RJCOU136.cname is '课程名称';
+
+comment on column RJCOU136.ctype is '课程种类';
+
+comment on column RJCOU136.etype is '课程种类';
+
+comment on column RJCOU136.cmodify is '修改时间';
+
+comment on column RJCOU136.clevel is '学分';
+
+comment on column RJCOU136.cbefore is '前序课程';
+
+comment on column RJCOU136.cprof is '所属专业';
+ 
+alter table RJCOU136 modify ctype default '专业必修';
+
+alter table RJCOU136 modify cmodify default sysdate;
+
+alter table RJCOU136 modify clevel default 2;
+
+drop table RJCOU136;
+
+shutdown immediate;
+conn system/647001
+startup 
+
+
+
+
+
+
+
+
+
+

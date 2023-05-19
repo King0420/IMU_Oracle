@@ -1,0 +1,79 @@
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+
+
+
+show parameter control
+select * from v$controlfile;
+set line3000
+select name,value from v$parameter where name='control_files';
+select name,value from v$parameter2 where name='control_files';
+select name,value from v$spparameter where name='control_files';
+alter system set control_files='d:\oracle\aT647001a\CTR0.CTL','e:\oracle\aT647001e\CTR22.CTL','f:\oracle\aT647001g\CTR543.CTL' scope=spfile;
+
+//修改控制文件
+set line3000
+$md d:\oracle\dT747001\d1
+select * from v$controlfile;
+alter system set control_files='','','' scope=spfile;       ////写全了   不能有空格
+shutdown immediate                                          //第一次关机
+$copy C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\GCD.CTL   d:\oracle\aT647001a\CTR0.CTL
+$copy C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\GCD.CTL   e:\oracle\aT647001e\CTR22.CTL
+$copy C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\GCD.CTL   f:\oracle\aT647001g\CTR543.CTL
+startup
+select * from v$controlfile;
+
+//重建控制   继续
+alter database backup controlfile to trace;
+show parameter diag
+host start C:\ORA19C\T647001\DIAG           //找到文件diag\rdbms\t647001\t647001\trace\alert_t647001.log打开
+shutdown immediate                                          //第二次关机
+//从diag\rdbms\t647001\t647001\trace\alert_t647001.log文件复制顺序、
+//第一步
+STARTUP NOMOUNT
+//第二步
+CREATE CONTROLFILE REUSE DATABASE "T647001" NORESETLOGS  NOARCHIVELOG
+    MAXLOGFILES 21
+    MAXLOGMEMBERS 
+    MAXDATAFILES 250
+    MAXINSTANCES 3
+    MAXLOGHISTORY 292
+LOGFILE
+  GROUP 1 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\RDEAA.RDO'  SIZE 90M BLOCKSIZE 512,
+  GROUP 4 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\DRGED.RDO'  SIZE 90M BLOCKSIZE 512
+-- STANDBY LOGFILE
+DATAFILE
+  'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\SYSTEM01.DBF',
+  'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\SYSAUX01.DBF',
+  'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\UNDOTBS01.DBF',
+  'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\USERS01.DBF'
+CHARACTER SET ZHS16GBK
+;
+
+//第三步           RECOVER DATABASE;
+
+//第四步           ALTER DATABASE OPEN;
+//第五步
+ALTER TABLESPACE TAT_GBD ADD TEMPFILE 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\TEMP01.DBF'
+     SIZE 20971520  REUSE AUTOEXTEND ON NEXT 655360  MAXSIZE 8191M;
+
+
+
+//startup出错了怎么改
+
+alter session set nls_language='american';
+alter database mount;
+
+
+//
+    MAXLOGFILES 18     //最大日志文件数
+    MAXLOGMEMBERS 3    //最大日志成员数
+    MAXDATAFILES 200    //最大数据文件数
+    MAXINSTANCES 8      //最大会话数
+    MAXLOGHISTORY 292    //最大日志历史数
+
+
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';

@@ -1,0 +1,134 @@
+net start oracleservicet647001
+set oracle_sid=t647001
+sqlplus/nolog
+connect /as sysdba
+startup
+$ set path
+show parameter keep
+set line 3000
+col name for a20
+col value for a30
+
+show parameter db_keep_cache_size
+select name,value from v$parameter where name='db_keep_cache_size';
+select name,value from v$spparameter where name='db_keep_cache_size';
+
+
+select name,value/1024/1024||'MB' from v$parameter where name='db_keep_cache_size';
+select name,value/1024/1024||'MB' from v$spparameter where name='db_keep_cache_size';
+
+alter system set db_keep_cache_size=12m;
+alter system set db_keep_cache_size=24m scope=memory;    //改内存
+alter system set db_keep_cache_size=24m scope=spfile;
+
+//由open到shutdown
+select instance_name,status from v$instance;
+alter database close immediate;                  //从open到mount
+alter database dismount;                         //从mount到nomount(started)
+shutdown immediate
+
+//由shutdown到open
+startup nomount
+alter database mount;
+alter database open;
+
+show parameter spfile
+select name,value from v$parameter where name='spfile';
+col value for a100
+alter system set memory_max_target=100m scope=spfile;
+startup force
+show  parameter memory
+
+
+show parameter sga
+alter system set db_cache_size=1200m;                     //错误
+alter system set db_cache_size=1200m scope=spfile;        //故意错误修改
+startup force                                             //重启
+create pfile='e:\b.txt'from spfile;                       //创建文件
+$notepad e:\b.txt                                         //打开文件修改指定参数值
+startup nomount pfile='e:\b.txt'                          //打开nomout状态
+create spfile from pfile='e:\d.txt';                      //由pfile创建spfile
+startup force                                             //重启
+show parameter spfile                                     //value有值了，启动由spfile启动
+show parameter db_cache_size                              //修改的值正确
+
+
+//数字字典
+col table_name for a30
+col comments for a200
+select * from dictionary where rownum<3;
+select*from dict where table_name like'%CONSTRAINT%';
+
+
+
+
+
+set oracle_sid=T747001
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+conn system@s_t647001      //建立会话数
+conn system@s_t747001 
+
+
+conn system@s_t121375
+
+
+
+
+
+
+
+
+
+
+
+
+
+alter system enable restricted session;
+alter system disable restricted session;
+alter system set db_cache_advice='off' scope=memory;
+alter system set db_cache_advice='on' scope=spfile;
+
+alter system set db_keep_cache_size=256m scope=memory;    
+alter system set memory_max_target=3216m scope=spfile;
+
+alter system set memory_target=3216m scope=spfile;
+
+
+alter system set diagnostic_dest='c:\ora19c\T647001\diag' scope=spfile;
+
+
+
+
+alter system set db_keep_cache_size=256m scope=memory;
+
+
+alter system set db_keep_cache_size=256m scope=memory
+
+
+重新整理
+shutdown immediate
+
+
+alter system enable restricted session;
+alter system set memory_max_target=3216m scope=spfile;
+alter system set memory_target=3216m scope=spfile;
+alter system set sga_max_size=1504m scope=spfile;
+alter system set sga_target=0 scope=spfile;
+alter system set pga_aggregate_target=80m scope=spfile;
+alter system set db_cache_size=336m scope=spfile;
+alter system set java_pool_size=224m scope=spfile;
+alter system set db_keep_cache_size=96m scope=spfile;
+
+
+alter system set memory_max_target=2672m scope=memory;
+///alter system set memory_target=3216m scope=spfile;
+alter system set sga_max_size=1632m scope=spfile;
+alter system set sga_target=0 scope=spfile;
+alter system set pga_aggregate_target=160m scope=memory;
+alter system set db_keep_cache_size=336m scope=spfile;
+alter system set java_pool_size=128m scope=memory;

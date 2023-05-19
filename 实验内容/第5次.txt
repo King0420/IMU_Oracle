@@ -1,0 +1,130 @@
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+
+
+select * from v$log;
+select * from v$logfile;
+alter system switch logfile;
+
+alter database  add logfile group 5
+('d:\oracle\aT647001a\64700151.rdo','e:\oracle\aT647001e\64700152.rdo','f:\oracle\aT647001g\64700153.rdo')
+size 90m;
+
+
+alter database add logfile member
+'d:\oracle\aT647001a\64700111.rdo' to group 1,
+'e:\oracle\aT647001e\64700112.rdo' to group 1,
+'f:\oracle\aT647001g\64700113.rdo' to group 1,
+'d:\oracle\aT647001a\64700141.rdo' to group 4,
+'e:\oracle\aT647001e\64700142.rdo' to group 4,
+'f:\oracle\aT647001g\64700143.rdo' to group 4;
+
+alter database drop logfile group 6;
+
+alter database drop logfile member
+'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\DRGED.RDO';
+
+alter database drop logfile member
+'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\RDEAA.RDO';
+
+show parameter online
+alter system set db_create_online_log_dest_1='d:\oracle\aT647001a';
+alter system set db_create_online_log_dest_2='e:\oracle\aT647001e';
+alter system set db_create_online_log_dest_3='f:\oracle\aT647001g';
+alter database add logfile group 7 size 90m;
+
+alter system switch logfile;
+
+alter system set fast_start_mttr_target=960;
+
+
+
+
+archive log list
+shutdown immediate
+startup mount
+archive log list
+alter database archivelog;        //alter database noarchivelog;  
+alter database open;
+
+$start rman /
+$cmd
+set oracle_sid=T647001
+rman target /
+backup database;
+exit
+exit
+
+show parameter archive
+select * from v$archive_processes;
+alter system set log_archive_max_processes=3;
+
+
+show parameter archive
+
+$md d:\arc\aT647001c\
+
+alter system set log_archive_dest_1='location=d:\arc\aT647001c\ mandatory';
+alter system set log_archive_dest_2='location=e:\arc\aT647001e\';
+alter system set log_archive_dest_3='location=f:\arc\aT647001g\';
+
+
+select * from v$archive_dest;
+
+alter system set log_archive_min_succeed_dest=2;
+
+alter system archive log current;
+
+
+
+
+
+
+
+
+
+	 管理联机重做日志,要求如下：
+		 1）联机重做日志文件特征：
+
+		 2）---- 第n(1≦n≦3)个成员的存储位置等同于第n个控制文件存储位置，
+		 3）---- 文件名（非OMF机制，组号和成员号均为1位）命名为“<学号后6位><组号><成员号>.rdo”；
+		 4）---- 文件大小与日志组1相同；
+
+		 5）维护联机重做日志文件：
+
+		 6）---- 移动现有联机重做日志组成员并改名，
+		 7）---- 向每个联机重做日志组各增加两个成员，且保证它们的状态为正常；
+
+		 8）不使用OMF机制，增加联机重做日志组：
+		 9）---- 组号为6，
+		10）---- 状态修改为已使用；、
+
+		11）使用OMF机制，增加联机重做日志组：
+		12）---- （OMF)组号为7，
+		13）---- （OMF)状态修改为已使用；
+
+		14）其它设置：
+
+		15）---- 例程恢复所用最长时间设置为16分钟，
+		16）---- SMON进程在修复时唯一使用的联机重做日志组设置为4。
+
+
+	 管理归档日志,要求如下：
+
+		 1）重做日志工作方式为归档日志模式，
+		 2）归档日志存放位置数设置为3，
+		 3）最大归档进程数设置为3，
+		 4）第1个位置必须归档成功，才可以进行日志切换，
+
+		 5）指定第1个归档位置设置为“d:\arc\aT647001c\”，
+		 6）指定第2个归档位置设置为“e:\arc\aT647001e\”，
+		 7）指定第3个归档位置设置为“f:\arc\aT647001g\”，
+
+		 8）日志切换前至少成功归档位置数为3，
+		 9）生成归档日志文件，
+		10）使用RMAN对数据库做在线完全备份。
+

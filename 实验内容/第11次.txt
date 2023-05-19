@@ -1,0 +1,375 @@
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+
+set oracle_sid=T747001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+切换用户 conn   system 647001
+
+
+col file_name for a75
+select * from dba_data_files;
+
+///////////////////////////////////////////////////////////////////////////////////////
+T647001
+
+conn system/647001
+
+分区表   RJEMP381
+
+索引组织的表 RJCOU742
+
+包含大对象段的表 RJPAR643
+
+
+
+非空	
+Alter table RJCOU136  modify cprof not null;
+
+Alter table RJCOU136 rename constraint  SYS_C006198 to cprof_RJCOU136_nk;
+
+
+Alter table RJPAR643 add constraint parpname_RJPAR643_nk check(parpname is not null) deferrable initially deferred;
+
+Alter table RJPAR643 drop constraint parpname_RJPAR643_nk;
+
+alter table RJCOU136 disable validate constraint cprof_RJCOU136_nk;
+
+alter table RJPAR643 disable validate constraint parpname_RJPAR643_nk;
+
+//唯一
+
+Alter table RJDEPT365 add constraint dept_dname_RJDEPT365_uk unique(dept_dname);
+
+alter table RJDEPT365 disable novalidate constraint dept_dname_RJDEPT365_uk;
+
+
+Alter table RJDEPT365 add constraint dept_dname_RJDEPT365_uk unique(dept_dname) deferrable initially immediate;
+
+Alter table RJCOU742 add constraint cname_RJCOU742_uk unique(cname) deferrable initially immediate;
+
+alter table RJCOU742 enable novalidate constraint cname_RJCOU742_uk;
+//唯一索引
+
+alter index cname_RJCOU742_uk rename to cname_RJCOU742_ind;
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool recycle);
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool keep); 
+alter index cname_RJCOU742_ind rebuild tablespace TDI_502;
+
+//主键
+
+Alter table RJCOU136 add constraint cno_RJCOU136_pk primary key(cno) deferrable initially immediate;
+
+Alter table RJCOU136 drop constraint cno_RJCOU136_pk;
+
+Alter table RJDEPT365 add constraint dept_dno_RJDEPT365_pk primary key(dept_dno);
+
+alter table RJDEPT365 disable validate constraint dept_dno_RJDEPT365_pk;
+
+
+//主键索引
+alter index cno_RJCOU136_pk rename to cno_RJCOU136_ind;
+
+alter index cno_RJCOU136_ind initrans 16 ;
+
+
+///////////////////外键
+
+Alter table RJEMP381 add constraint emanager_RJEMP381_rk foreign key(emanager) references RJEMP381(eno) on delete set null;
+
+Alter table RJEMP381 add constraint eno_RJEMP381_pk primary key(eno);
+
+
+select * from RJEMP381; 
+
+update RJEMP381 set emanager=eno;
+
+
+alter table RJEMP381 disable novalidate constraint emanager_RJEMP381_rk;
+
+rollback
+
+//第二个
+Alter table RJPAR643 add constraint parsub_RJPAR643_rk foreign key(parsub) references RJPAR643(parid)  on delete cascade deferrable initially immediate;
+
+Alter table RJPAR643 add constraint parid_RJPAR643_pk primary key(parid);
+
+select * from RJPAR643; 
+
+update RJPAR643 set parsub=parid;
+
+Alter table RJPAR643 drop constraint parid_RJPAR643_pk ;
+
+Alter table RJPAR643 drop constraint PARPNAME_RJPAR643_NK ;
+
+
+//检查
+
+Alter table RJCOU136 add constraint clevel_RJCOU136_ck check(clevel between 1 and 8 ) deferrable initially deferred;
+
+
+alter table RJCOU136 disable novalidate constraint clevel_RJCOU136_ck;
+
+
+Alter table RJEMP381 add constraint eincome_RJEMP381_ck check(eincome>=1800 and eincome<=1000000);
+
+update RJEMP381 set eincome= eincome+2000;
+
+
+
+
+
+
+
+col owner for a20
+col r_owner for a20
+col constraint_name for a30
+col table_name for a20
+col search_condititon for a100
+col search_condition_vc for a50
+select * from user_constraints where table_name='RJPAR643';
+
+
+col index_name for a20
+col table_owner for a20
+col table_name for a20
+col index_type for a20
+select * from user_indexes where table_name='RJCOU742';
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+T647001
+
+///////////////////主键
+//第一个
+
+Alter table RJSTU256 add constraint RJSTU256_p_stuno primary key(stuno) deferrable initially deferred;
+
+alter index RJSTU256_p_stuno rename to RJSTU256_i_stuno;
+
+alter index RJSTU256_i_stuno initrans 11 ;
+
+//第二个  RJEMP333.emp_no 
+
+Alter table RJEMP333 add constraint RJEMP333_p_emp_no primary key(emp_no);
+
+alter table RJEMP333 disable novalidate constraint RJEMP333_p_emp_no;
+
+
+
+Alter table RJCOU136 drop constraint cno_RJCOU136_pk;
+
+///////////////////外键
+//第三个  RJCOU234.couspno  RJSPEC525.specspno
+Alter table RJCOU234 add constraint RJCOU234_r_couspno foreign key(couspno) references RJSPEC525(specspno);
+
+Alter table RJSPEC525 add constraint RJSPEC525_p_specspno primary key(specspno);
+
+
+select * from RJEMP381; 
+
+update RJEMP381 set emanager=eno;
+
+alter table RJEMP381 disable novalidate constraint emanager_RJEMP381_rk;
+
+
+rollback
+
+//第四个
+Alter table RJPAR643 add constraint parsub_RJPAR643_rk foreign key(parsub) references RJPAR643(parid)  on delete cascade deferrable initially immediate;
+
+Alter table RJPAR643 add constraint parid_RJPAR643_pk primary key(parid);
+
+select * from RJPAR643; 
+
+update RJPAR643 set parsub=parid;
+
+
+Alter table RJPAR643 drop constraint parid_RJPAR643_pk ;
+
+Alter table RJPAR643 drop constraint PARPNAME_RJPAR643_NK ;
+
+
+//////////////////非空
+//第五个
+Alter table RJCOU136  modify cprof not null;
+
+select * from user_constraints where table_name='RJCOU136';
+
+Alter table RJCOU136 rename constraint  SYS_C006198 to cprof_RJCOU136_nk;
+
+
+//第六个
+Alter table RJPAR643 add constraint parpname_RJPAR643_nk check(parpname is not null) deferrable initially deferred;
+
+
+alter table RJPAR643 disable validate constraint parpname_RJPAR643_nk;
+
+
+
+Alter table RJPAR643 drop constraint parpname_RJPAR643_nk;
+
+alter table RJCOU136 disable validate constraint cprof_RJCOU136_nk;
+
+//////////////////唯一
+//第七个
+Alter table RJDEPT365 add constraint dept_dname_RJDEPT365_uk unique(dept_dname);
+
+alter table RJDEPT365 disable novalidate constraint dept_dname_RJDEPT365_uk;
+
+//第八个
+
+Alter table RJCOU742 add constraint cname_RJCOU742_uk unique(cname) deferrable initially immediate;
+
+alter table RJCOU742 enable novalidate constraint cname_RJCOU742_uk;
+
+
+alter index cname_RJCOU742_uk rename to cname_RJCOU742_ind;
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool keep); 
+alter index cname_RJCOU742_ind rebuild tablespace TDI_502;
+
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool recycle);
+
+//////////////////检查
+//第九个
+
+Alter table RJCOU136 add constraint clevel_RJCOU136_ck check(clevel between 1 and 8 ) deferrable initially deferred;
+
+
+alter table RJCOU136 disable novalidate constraint clevel_RJCOU136_ck;
+
+//第十个
+Alter table RJEMP381 add constraint eincome_RJEMP381_ck check(eincome>=1800 and eincome<=1000000);
+
+update RJEMP381 set eincome= eincome+2000;
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ 第二次练习    T747001
+
+
+conn system/747001
+
+///////////////////主键
+//第一个
+
+Alter table RJCOU136 add constraint cno_RJCOU136_pk primary key(cno) deferrable initially immediate;
+
+alter index cno_RJCOU136_pk rename to cno_RJCOU136_ind;
+
+alter index cno_RJCOU136_ind initrans 16 ;
+
+//第二个
+
+Alter table RJDEPT365 add constraint dept_dno_RJDEPT365_pk primary key(dept_dno);
+
+alter table RJDEPT365 disable validate constraint dept_dno_RJDEPT365_pk;
+
+
+
+Alter table RJCOU136 drop constraint cno_RJCOU136_pk;
+
+///////////////////外键
+//第三个
+Alter table RJEMP381 add constraint emanager_RJEMP381_rk foreign key(emanager) references RJEMP381(eno) on delete set null;
+
+Alter table RJEMP381 add constraint eno_RJEMP381_pk primary key(eno);
+
+
+select * from RJEMP381; 
+
+update RJEMP381 set emanager=eno;
+
+alter table RJEMP381 disable novalidate constraint emanager_RJEMP381_rk;
+
+
+rollback
+
+//第四个
+Alter table RJPAR643 add constraint parsub_RJPAR643_rk foreign key(parsub) references RJPAR643(parid)  on delete cascade deferrable initially immediate;
+
+Alter table RJPAR643 add constraint parid_RJPAR643_pk primary key(parid);
+
+select * from RJPAR643; 
+
+update RJPAR643 set parsub=parid;
+
+
+Alter table RJPAR643 drop constraint parid_RJPAR643_pk ;
+
+Alter table RJPAR643 drop constraint PARPNAME_RJPAR643_NK ;
+
+
+//////////////////非空
+//第五个
+Alter table RJCOU136  modify cprof not null;
+
+select * from user_constraints where table_name='RJCOU136';
+
+Alter table RJCOU136 rename constraint  SYS_C006198 to cprof_RJCOU136_nk;
+
+
+//第六个
+Alter table RJPAR643 add constraint parpname_RJPAR643_nk check(parpname is not null) deferrable initially deferred;
+
+
+alter table RJPAR643 disable validate constraint parpname_RJPAR643_nk;
+
+
+
+Alter table RJPAR643 drop constraint parpname_RJPAR643_nk;
+
+alter table RJCOU136 disable validate constraint cprof_RJCOU136_nk;
+
+//////////////////唯一
+//第七个
+Alter table RJDEPT365 add constraint dept_dname_RJDEPT365_uk unique(dept_dname);
+
+alter table RJDEPT365 disable novalidate constraint dept_dname_RJDEPT365_uk;
+
+//第八个
+
+Alter table RJCOU742 add constraint cname_RJCOU742_uk unique(cname) deferrable initially immediate;
+
+alter table RJCOU742 enable novalidate constraint cname_RJCOU742_uk;
+
+
+alter index cname_RJCOU742_uk rename to cname_RJCOU742_ind;
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool keep); 
+alter index cname_RJCOU742_ind rebuild tablespace TDI_502;
+
+
+alter index cname_RJCOU742_ind initrans 19 storage (buffer_pool recycle);
+
+//////////////////检查
+//第九个
+
+Alter table RJCOU136 add constraint clevel_RJCOU136_ck check(clevel between 1 and 8 ) deferrable initially deferred;
+
+
+alter table RJCOU136 disable novalidate constraint clevel_RJCOU136_ck;
+
+//第十个
+Alter table RJEMP381 add constraint eincome_RJEMP381_ck check(eincome>=1800 and eincome<=1000000);
+
+update RJEMP381 set eincome= eincome+2000;
+
+
+

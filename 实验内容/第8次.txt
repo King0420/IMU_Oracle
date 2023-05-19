@@ -1,0 +1,472 @@
+
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+
+
+//查表空间
+set line 3000
+show parameter sort
+select * from dba_tablespaces;
+
+
+//默认的（缺省的）表空间
+set line 3000
+col property_value for a50
+col property_name for a50
+col description for a200
+select * from  database_properties;
+
+
+alter tablespace userdata offline;
+alter tablespace userdata online;
+
+
+select * from dba_data_files;
+col file_name for a75
+select * from v$logfile order by 1,4;
+
+alter database move datafile '' to ''; 
+alter database move datafile 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\USERS01.DBF' to 'F:\ORACLE\AT647001G\DA521.DBF';
+
+
+select * from dba_data_files;
+alter database datafile '' autoextend off;
+alter database datafile '' resize 120m;
+  
+alter database datafile '' autoextend on next 100k maxsize 100m;
+alter database datafile 'F:\ORACLE\AT647001G\DA521.DBF' autoextend on next 5600k maxsize 220m;
+
+
+drop tablespace TAT_GBD including contents and datafiles;
+
+
+//系统表空间 system
+//辅助表空间 
+
+
+
+//临时表空间特别
+
+select * from dba_temp_files;
+alter tablespace TCT_EC8 add tempfile '' size 100m;
+alter tablespace TCT_EC8 add tempfile 'D:\ORACLE\AT647001A\FA53.DBF' size 160m;
+alter tablespace TCT_EC8 drop tempfile '' ;
+
+
+
+drop tablespace TAT_GBD including contents and datafiles;
+
+
+shutdown immidate
+startup mount
+$move C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\TEMP01.DBF D:\ORACLE\AT647001A\FA53.DBF
+alter database rename file 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\TEMP01.DBF'to'D:\ORACLE\AT647001A\FA53.DBF';
+alter database open;
+select * from dba_temp_files;
+alter database tempfile '' resize 160m;
+alter database tempfile '' autoextend off;
+alter database tempfile '' autoextend on next 13m maxsize 470m;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//开始T647001 练习一  排序区大小：64k
+
+位置
+//第一个和第二个                            //3,4
+alter system set db_create_file_dest='E:\ORACLE\AT647001E\';
+
+
+
+//第三个和第四个和第六个                    //6
+alter system set db_create_file_dest='F:\ORACLE\AT647001G\';
+
+
+
+//第五个                                     //
+
+alter system set db_create_file_dest='D:\ORACLE\AT647001A\';
+
+
+
+//创建表空间
+
+//第一个
+create undo tablespace TSSA_8 datafile size 380m ;
+
+
+//第二个
+
+create bigfile temporary tablespace TSSA_12 tempfile size 40m autoextend on next 35m maxsize 150m uniform size 256k;
+
+
+//第三个
+
+create  temporary tablespace TSSA_153 tempfile size 50m autoextend on next 5340k maxsize 130m uniform size 384k;
+
+//第四个
+
+create bigfile temporary tablespace TSSA_B tempfile size 80m autoextend on next 3860k maxsize 240m uniform size 128k;
+
+//第五个
+
+create undo tablespace TSSA_AG datafile size 480m retention guarantee;
+
+
+//第六个
+
+create bigfile undo tablespace TSSA_GGF datafile size 490m ;
+
+
+
+//第七个
+
+当前还原表空间设置为第2个还原表空间
+alter system set undo_tablespace='TSSA_AG';
+
+还原数据的保留时间(分钟)设置为2；
+alter system set undo_retention=120;
+		
+当前缺省临时表空间设置为第2个临时表空间；
+
+alter database default temporary tablespace TSSA_153;
+
+
+
+数据库闪回设置为“支持”，
+select flashback_on from v$database;
+archive log list
+show parameter recove
+
+
+shutdown immediate;
+startup mount
+alter database archivelog;
+alter system set db_recovery_file_dest_size=4G;
+$md F:\ORACLE\AT647001G\recovery
+alter system set db_recovery_file_dest='F:\ORACLE\AT647001G\recovery';
+alter database flashback on;
+alter system set db_flashback_retention_target=60;
+alter database open;
+
+
+
+
+alter database flashback off;
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//T747001练习二   排序区大小：64k
+
+
+位置
+//     4，5                     
+alter system set db_create_file_dest='D:\ORACLE\DT747001\D1\';
+
+
+
+//                
+alter system set db_create_file_dest='E:\ORACLE\DT747001\D5\';
+
+
+
+//    2                                 
+
+alter system set db_create_file_dest='F:\ORACLE\DT747001\D9\';
+
+
+drop tablespace TAT_GBD including contents and datafiles;
+
+//创建表空间
+
+//第一个
+create undo tablespace TSSD_4 datafile size 490m retention guarantee ;
+
+
+//第二个
+
+create bigfile undo tablespace TSSD_16 datafile size 470m retention guarantee;
+
+
+//第三个
+
+create  temporary tablespace TSSD_420 tempfile size 30m uniform size 512k;
+
+//第四个2
+
+create bigfile temporary tablespace TSSD_D tempfile size 70m autoextend on next 17m maxsize 250m uniform size 384k;
+
+//第五个
+
+create temporary tablespace TSSD_EE tempfile size 30m autoextend on next 11680k maxsize 270m uniform size 512k;
+
+
+
+//第六个2
+
+create bigfile undo tablespace TSSD_AAG datafile size 300m autoextend on next 40960k maxsize 630m retention guarantee;
+
+
+
+
+//第七个
+
+当前还原表空间设置为第2个还原表空间
+alter system set undo_tablespace='TSSD_16';
+
+还原数据的保留时间(分钟)设置为2；
+alter system set undo_retention=1200;
+		
+当前缺省临时表空间设置为第2个临时表空间；
+
+alter database default temporary tablespace TSSD_420;
+
+
+
+数据库闪回设置为“支持”，
+select flashback_on from v$database;
+archive log list
+show parameter recove
+
+
+shutdown immediate;
+startup mount
+alter database archivelog;
+alter system set db_recovery_file_dest_size=4G;
+$md e:\oracle\dT747001\d5\recovery
+alter system set db_recovery_file_dest='e:\oracle\dT747001\d5\recovery';
+alter database flashback on;
+alter system set db_flashback_retention_target=60;
+alter database open;
+
+
+
+
+alter database flashback off;
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//T121375 正式的一次   排序区大小：64k
+64*2=128k
+64*4=256k
+64*6=384k
+64*8=512k
+
+
+位置
+//        4                  
+alter system set db_create_file_dest='D:\ORACLE\CT121375\DISKB\';
+
+
+
+//    3，5                
+alter system set db_create_file_dest='E:\ORACLE\CT121375\DISKE\';
+
+
+
+//                                     
+
+alter system set db_create_file_dest='F:\ORACLE\CT121375\DISKH\';
+
+
+drop tablespace  including contents and datafiles;
+
+//创建表空间
+
+//第一个5
+create bigfile undo tablespace TSSC_5 datafile size 330m ;
+
+
+//第二个3
+
+create bigfile temporary tablespace TSSA_12 tempfile size 40m autoextend on next 35m maxsize 150m uniform size 256k;
+
+create  undo tablespace TSSC_73 datafile size 310m autoextend on next 19m maxsize 620m ;
+
+//第三个4
+
+create  temporary tablespace TSSA_153 tempfile size 50m autoextend on next 5340k maxsize 130m uniform size 384k;
+
+
+create bigfile undo tablespace TSSC_511 datafile size 320m autoextend on next 21m maxsize 570m ;
+
+//第四个4
+
+create  temporary tablespace TSSC_C tempfile size 80m autoextend on next 29m maxsize 130m uniform size 640k;
+
+//第五个3
+
+create undo tablespace TSSA_AG datafile size 480m retention guarantee;
+
+create bigfile temporary tablespace TSSC_FF tempfile size 90m  uniform size 384k;
+
+//第六个4
+
+create bigfile undo tablespace TSSA_GGF datafile size 490m ;
+
+create bigfile undo tablespace TSSD_AAG datafile size 300m autoextend on next 40960k maxsize 630m retention guarantee;
+
+
+
+create  temporary tablespace TSSC_GDD tempfile size 30m  uniform size 384k;
+
+//第七个
+
+当前还原表空间设置为第2个还原表空间
+alter system set undo_tablespace='TSSC_73';
+
+还原数据的保留时间(分钟)设置为2；
+alter system set undo_retention=1200;
+		
+当前缺省临时表空间设置为第2个临时表空间；
+
+alter database default temporary tablespace TSSC_GDD;
+
+
+
+数据库闪回设置为“支持”，
+select flashback_on from v$database;
+archive log list
+show parameter recove
+
+
+shutdown immediate;
+startup mount
+alter database archivelog;
+alter system set db_recovery_file_dest_size=4G;
+$md E:\ORACLE\CT121375\DISKE\recovery
+alter system set db_recovery_file_dest='E:\ORACLE\CT121375\DISKE\recovery';
+alter database flashback on;
+alter system set db_flashback_retention_target=180;
+alter database open;
+
+
+
+
+alter database flashback off;
+
+
+
+                 2）-- 第1个控制文件：
+		 3）---- ①存放位置为“d:\oracle\cT121375\diskb”，
+		 4）---- ①文件名命名为“CTN1.LCT”；
+		 5）-- 第2个控制文件：
+		 6）---- ②存放位置为“e:\oracle\cT121375\diske”，
+		 7）---- ②文件名命名为“CTN34.LCT”；
+		 8）-- 第3个控制文件：
+		 9）---- ③存放位置为“f:\oracle\cT121375\diskh”，
+		10）---- ③文件名命名为“CTN810.LCT”；
+
+
+
+	 2、创建第1个特殊表空间（OMF机制）,要求如下：
+		 1）①～创建第1个特殊表空间：
+		 2）①～--- 表空间信息：
+		 3）①～------- 表空间名命名为“TSSA_8”，
+		 4）①～------- 数据文件数设置为“可以有多个”，
+		 5）①～------- 存储内容为“还原段”，
+		 6）①～------- 表空间状态保持为“在线”，
+		 7）①～------- 还原保留保证设置为“否”；
+		 8）①～--- 文件信息：
+		 9）①～------- 与第6个普通表空间包含的文件放在一起，
+		10）①～------- 文件数为1，
+		11）①～------- 文件大小设置为380MB，
+		12）①～------- 文件自动扩展特性为“不支持”。
+	 3、创建第2个特殊表空间（OMF机制）,要求如下：
+		 1）②～创建第2个特殊表空间：
+		 2）②～--- 表空间信息：
+		 3）②～------- 表空间名命名为“TSSA_12”，
+		 4）②～------- 数据文件数设置为“只能有一个”，
+		 5）②～------- 存储内容为“临时段”，
+		 6）②～------- 表空间状态保持为“在线”，
+		 7）②～------- 区大小(排序区的倍数)设置为4：
+		 8）②～--- 文件信息：
+		 9）②～------- 与第3个普通表空间包含的文件放在一起，
+		10）②～------- 文件数为1，
+		11）②～------- 文件大小设置为40MB，
+		12）②～------- 文件自动扩展特性为“支持”，
+		13）②～------- 每次扩展量（MB）为35，
+		14）②～------- 文件最大扩展容量为150MB。
+	 4、创建第3个特殊表空间（OMF机制）,要求如下：
+		 1）③～创建第3个特殊表空间：
+		 2）③～--- 表空间信息：
+		 3）③～------- 表空间名命名为“TSSA_153”，
+		 4）③～------- 数据文件数设置为“可以有多个”，
+		 5）③～------- 存储内容为“临时段”，
+		 6）③～------- 表空间状态保持为“在线”，
+		 7）③～------- 区大小(排序区的倍数)设置为6：
+		 8）③～--- 文件信息：
+		 9）③～------- 与第6个普通表空间包含的文件放在一起，
+		10）③～------- 文件数为1，
+		11）③～------- 文件大小设置为50MB，
+		12）③～------- 文件自动扩展特性为“支持”，
+		13）③～------- 每次扩展量（块数）为2670，
+		14）③～------- 文件最大扩展容量为130MB。
+	 5、创建第4个特殊表空间（OMF机制）,要求如下：
+		 1）④～创建第4个特殊表空间：
+		 2）④～--- 表空间信息：
+		 3）④～------- 表空间名命名为“TSSA_B”，
+		 4）④～------- 数据文件数设置为“只能有一个”，
+		 5）④～------- 存储内容为“临时段”，
+		 6）④～------- 表空间状态保持为“在线”，
+		 7）④～------- 区大小(排序区的倍数)设置为2：
+		 8）④～--- 文件信息：
+		 9）④～------- 与第3个普通表空间包含的文件放在一起，
+		10）④～------- 文件数为1，
+		11）④～------- 文件大小设置为80MB，
+		12）④～------- 文件自动扩展特性为“支持”，
+		13）④～------- 每次扩展量（块数）为1930，
+		14）④～------- 文件最大扩展容量为240MB。
+	 6、创建第5个特殊表空间（OMF机制）,要求如下：
+		 1）⑤～创建第５个特殊表空间：
+		 2）⑤～--- 表空间信息：
+		 3）⑤～------- 表空间名命名为“TSSA_AG”，
+		 4）⑤～------- 数据文件数设置为“可以有多个”，
+		 5）⑤～------- 存储内容为“还原段”，
+		 6）⑤～------- 表空间状态保持为“在线”，
+		 7）⑤～------- 还原保留保证设置为“是”；
+		 8）⑤～--- 文件信息：
+		 9）⑤～------- 与第4个普通表空间包含的文件放在一起，
+		10）⑤～------- 文件数为1，
+		11）⑤～------- 文件大小设置为480MB，
+		12）⑤～------- 文件自动扩展特性为“不支持”。
+	 7、创建第6个特殊表空间（OMF机制）,要求如下：
+		 1）⑥～创建第６个特殊表空间：
+		 2）⑥～--- 表空间信息：
+		 3）⑥～------- 表空间名命名为“TSSA_GGF”，
+		 4）⑥～------- 数据文件数设置为“只能有一个”，
+		 5）⑥～------- 存储内容为“还原段”，
+		 6）⑥～------- 表空间状态保持为“在线”，
+		 7）⑥～------- 还原保留保证设置为“否”；
+		 8）⑥～--- 文件信息：
+		 9）⑥～------- 与第6个普通表空间包含的文件放在一起，
+		10）⑥～------- 文件数为1，
+		11）⑥～------- 文件大小设置为490MB，
+		12）⑥～------- 文件自动扩展特性为“不支持”。
+	 8、管理特殊表空间，设置闪回相关信息,要求如下：
+		 1）⑦～还原表空间：
+		 2）⑦～---- 当前还原表空间设置为第2个还原表空间，
+		 3）⑦～---- 还原数据的保留时间(分钟)设置为2；
+		 4）⑦～临时表空间：
+		 5）⑦～---- 当前缺省临时表空间设置为第2个临时表空间；
+		 6）⑦～数据库闪回：
+		 7）⑦～---- 数据库闪回设置为“支持”，
+		 8）⑦～---- 闪回日志位于后面括号中的文件位于的文件夹内的recovery文件夹（64700113.rdo），
+		 9）⑦～---- 闪回时间限制(小时)设置为1。
+
+考核提示
+	 1、如果检查出错，根据提示进行修改后再次检查，
+	 2、如果显示完成时间，全屏截图（包含任务栏中时间信息，白底黑字），
+	 3、把截图单独发QQ信息给辅导教师，让辅导教师确认，
+	 4、辅导教师确认后，退出腾讯会议，
+	 5、选择目标盘符，进行备份
+	 6、备份完成后，检查压缩备份文件大小，如果小于50MB，检查备份过程是否出错，调整后重新备份。

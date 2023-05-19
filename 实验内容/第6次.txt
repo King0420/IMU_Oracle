@@ -1,0 +1,151 @@
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+select name from v$database;
+select instance_name,status from v$instance;
+alter system set local_listener='(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=127.0.0.1)(PORT=1522)))';
+select * from v$log;
+select * from v$logfile;
+select * from v$logfile order by 1,4;
+
+alter system switch logfile;
+
+
+//查表空间
+set line 3000
+show parameter sort
+select * from dba_tablespaces;
+
+
+//默认的（缺省的）表空间
+select * from  database_properties;
+col property_value for a50
+col property_name for a50
+col description for a200
+
+
+
+alter tablespace userdata offline;
+alter tablespace userdata online;
+
+
+select * from dba_data_files;
+col file_name for a60
+select * from v$logfile order by 1,4;
+
+alter database move datafile '' to ''; 
+alter database move datafile 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\USERS01.DBF' to 'F:\ORACLE\AT647001G\DA521.DBF';
+
+
+select * from dba_data_files;
+alter database datafile '' autoextend off;
+alter database datafile '' resize 120m;
+  
+alter database datafile '' autoextend on next 100k maxsize 100m;
+alter database datafile 'F:\ORACLE\AT647001G\DA521.DBF' autoextend on next 5600k maxsize 220m;
+
+
+
+
+//临时表空间特别
+
+select * from dba_temp_files;
+alter tablespace TCT_EC8 add tempfile '' size 100m;
+alter tablespace TCT_EC8 add tempfile 'D:\ORACLE\AT647001A\FA53.DBF' size 160m;
+alter tablespace TCT_EC8 drop tempfile '' ;
+
+
+
+drop tablespace TAT_GBD including contents and datafiles;
+
+
+shutdown immidate
+startup mount
+$move C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\TEMP01.DBF D:\ORACLE\AT647001A\FA53.DBF
+alter database rename file 'C:\ORACLE3\APP\ADMINISTRATOR\ORADATA\T647001\TEMP01.DBF'to'D:\ORACLE\AT647001A\FA53.DBF';
+alter database open;
+select * from dba_temp_files;
+alter database tempfile '' resize 160m;
+alter database tempfile '' autoextend off;
+alter database tempfile '' autoextend on next 13m maxsize 470m;
+
+
+//系统表空间 system
+//辅助表空间 
+
+ 2、管理可脱机的表空间,要求如下：
+		 1）移动“缺省的永久表空间”包含的数据文件：
+
+		 2）---- ①表空间状态为“联机”，
+		 3）---- ①文件数为1，
+		 4）---- ①文件状态为“正常”，
+		 5）---- ①存放在后面括号中的文件位于的文件夹内（64700113.rdo），
+		 6）---- ①文件名修改为“DA521.DBF”，
+		 7）---- ①大小调整为120MB，
+		 8）---- ①自动扩展特性为“支持”，
+		 9）---- ①每次扩展量(块数)为2800，
+		10）---- ①最大扩展容量为220MB，
+
+		11）移动“辅助表空间”包含的数据文件：
+
+		12）---- ②表空间状态为“联机”，
+		13）---- ②文件数为1，
+		14）---- ②文件状态为“正常”，
+		15）---- ②存放在后面括号中的文件位于的文件夹内（64700152.rdo），
+		16）---- ②文件名修改为“DDA825.DBF”，
+		17）---- ②大小调整为620MB，
+		18）---- ②自动扩展特性为“不支持”。
+
+
+
+	 3、管理不可脱机的表空间,要求如下：
+		 1）移动“系统表空间”包含的数据文件：
+
+		 2）---- ③文件数为1，
+		 3）---- ③文件状态为“正常”，
+		 4）---- ③存放在后面括号中的文件位于的文件夹内（64700152.rdo），
+		 5）---- ③文件名修改为“FA1.DBF”，
+		 6）---- ③大小调整为1410MB，
+		 7）---- ③自动扩展特性为“支持”，
+		 8）---- ③每次扩展量(块数)为1970，
+		 9）---- ③最大扩展容量为3030MB，
+
+		10）移动“临时表空间”包含的临时文件：
+
+		11）---- ④文件数为1，
+		12）---- ④文件状态为“正常”，
+		13）---- ④存放在后面括号中的文件位于的文件夹内（64700141.rdo），
+		14）---- ④文件名修改为“FA53.DBF”，
+		15）---- ④大小调整为160MB，
+		16）---- ④自动扩展特性为“不支持”，
+
+		17）移动“还原表空间”包含的数据文件：
+
+		18）---- ⑤文件数为1，
+		19）---- ⑤文件状态为“正常”，
+		20）---- ⑤存放在后面括号中的文件位于的文件夹内（64700143.rdo），
+		21）---- ⑤文件名修改为“FA111.DBF”，
+		22）---- ⑤大小调整为530MB，
+		23）---- ⑤自动扩展特性为“支持”，
+		24）---- ⑤每次扩展量(MB)为7，
+		25）---- ⑤最大扩展容量为1120MB。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

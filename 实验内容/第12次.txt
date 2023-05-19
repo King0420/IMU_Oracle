@@ -1,0 +1,310 @@
+set oracle_sid=T647001
+sqlplus /nolog
+connect/as sysdba
+
+col username for a30
+select username,profile from dba_users order by 1;
+
+
+
+
+alter user test account lock;
+alter user test account unlock;
+
+
+select profile from dba_users where username='SYS';
+
+alter user test profile ;ora_stig_profie;
+
+alter user test password expire;
+
+alter user test profile default;
+
+select *from dba_procedures where rownum<2;
+
+col owner for a30
+
+col object_name for a30
+
+col procedure_name for a30
+
+
+select *from dba_procedures where object_name like '%VERIFY_FUNCTTON%';
+
+select *from dba_source where rownum<2;
+
+
+select * from dba_profiles where profile='DEFAULT';
+
+col profile for a20
+
+
+
+select username,account_status from dba_users where username='SYS';
+
+
+alter profile default limit failed_login_attempts 3;
+
+
+
+
+
+
+
+
+
+                 1）①--- 名称为PRO_784，
+		 2）①--- 口令校验函数设置为ORA12C_STIG_VERIFY_FUNCTION，
+
+		 3）①--- 口令考核内容为账户自动解锁期，
+		 4）①--- 口令考核量纲为天，
+		 5）①--- 口令考核值为30；
+
+		 6）①--- 旧口令考核内容为旧口令再次使用间隔期，
+		 7）①--- 旧口令考核量纲为周，
+		 8）①--- 旧口令考核值为10；
+
+		 9）①--- 用户登录考核内容为登录失败最多次数，
+		10）①--- 用户登录考核值为9；
+
+		11）①--- 会话考核内容为每个会话最长连接时间，
+		12）①--- 会话考核量纲为分钟，
+		13）①--- 会话考核值为690；
+
+		14）①--- CPU考核内容为每次调用执行最长CPU时间，
+		15）①--- CPU考核量纲为秒，
+		16）①--- CPU考核值为1；
+
+
+		17）①--- 逻辑块考核内容为每次调用读逻辑块最大数，
+		18）①--- 逻辑块考核值为250000，
+
+		19）①--- SGA中为UGA分配的标准块数为27000，
+
+		20）①--- 未要求设置的参数保持与缺省配置文件始终一致。
+
+
+
+
+INACTIVE_ACCOUNT_TIME   长时间不登录锁定账户
+
+grace
+
+password_reuse_time 30
+
+
+password_reuse_max 重新使用口令次数
+
+//T647001
+
+create profile PRO_784 limit
+failed_login_attempts 9      输错次数    
+password_lock_time 30        锁定天数
+password_life_time 30        口令失效生存期（天）
+password_reuse_time 70       重新使用口令天数
+password_reuse_max           重新使用口令次数
+password_verify_function     口令校验函数
+password_grace_time 5;       口令失效宽限期（天）
+
+
+sessions_per_user   会话数
+
+idle_time           不干活时间（分钟）
+
+
+
+口令校验函数:
+password_verify_function
+
+
+口令考核内容:
+password_lock_time      账户自动解锁期
+password_life_time      口令生存期
+inactive_account_time   账户未登录期限
+
+旧口令考核内容:
+password_reuse_time     再次使用间隔期
+password_reuse_max      旧口令可使用最多次数
+
+用户登录考核内容:
+failed_login_attempts     登录失败最多次数
+sessions_per_user         会话数
+
+会话考核内容:
+connect_time        连接时间（分钟）
+idle_time           每个会话最长空闲时间（分钟）
+
+CPU考核内容:
+cpu_per_session     每个会话使用最长CPU时间(0.01s)厘秒
+cpu_per_call        每次调用执行最长CPU时间（0.01s）
+
+逻辑块考核内容:
+logical_reads_per_session  每个会话读逻辑块最大数
+logical_reads_per_call     每次调用读逻辑块最大数
+
+SGA中为UGA分配:
+private_sga    （字节）
+
+1秒=10分秒=100厘秒
+
+
+create profile PRO_784 limit
+password_verify_function ORA12C_STIG_VERIFY_FUNCTION
+password_lock_time 30
+password_reuse_time 70
+failed_login_attempts 9 
+connect_time 690
+cpu_per_call 100
+logical_reads_per_call 250000
+private_sga 55296000;
+
+
+
+select * from dba_profiles where profile='PRO_784';
+select * from dba_profiles where profile='PRO_784';
+
+drop profile cascade;
+
+
+
+alter profile default limit
+FAILED_LOGIN_ATTEMPTS UNLIMITED
+PASSWORD_LIFE_TIME UNLIMITED
+PASSWORD_LOCK_TIME UNLIMITED
+PASSWORD_GRACE_TIME UNLIMITED;
+
+
+
+alter profile PRO_784 limit
+private_sga 55296000;
+
+
+show parameter resource
+alter system set resource_limit=true;
+
+
+/////////////////////////////////////////////////////////////////////////////////
+第二个配置文件
+
+create profile PRO_B31 limit
+password_verify_function VERIFY_FUNCTION
+password_life_time 90  
+password_reuse_max 6
+sessions_per_user 1
+connect_time 480
+cpu_per_call 900
+logical_reads_per_session 760000
+private_sga 155648000;
+
+
+
+alter profile PRO_B31 limit
+logical_reads_per_session 760000
+logical_reads_per_call UNLIMITED
+cpu_per_call 900;
+
+default
+
+alter profile PRO_B31 limit
+logical_reads_per_call default;
+
+select * from dba_profiles where profile='PRO_B31';
+//////////////////////////////////////////////////////////////////////////////////
+第三个配置文件
+
+
+create profile PRO_BA6 limit
+password_verify_function VERIFY_FUNCTION_11G
+inactive_account_time 120  
+password_reuse_time 60
+failed_login_attempts 5
+idle_time 96
+cpu_per_session 400
+logical_reads_per_call 740000
+private_sga 45056000;
+
+
+
+alter profile PRO_BA6 limit
+inactive_account_time 120
+password_life_time default 
+password_grace_time default;
+
+//////////////////////////////////////////////////////////////////////////////////
+第一个用户
+
+drop user;
+
+alter user;
+1）④--- 用户名命名为RJ_573，
+2）④--- 配置文件指定为第3个，
+3）④--- 临时表空间设置为第1个临时表空间；
+4）④--- 缺省表空间设置为第6个表空间，
+5）④--- 在缺省表空间上可使用空间设置为28MB，
+6）④--- 在第4个表空间上可使用空间设置为11MB。
+
+
+
+create user RJ_573
+temporary tablespace TSSA_12
+default tablespace TSA_6
+quota 28m on TSA_6
+quota 11m on TSA_077
+profile PRO_BA6;
+
+
+
+create user RJ_D40
+temporary tablespace TSSA_B
+default tablespace TSA_077
+quota 29m on TSA_077
+quota 27m on TSA_7277
+profile PRO_784;
+
+
+
+create user RJ_DD0
+temporary tablespace TSSA_153
+default tablespace TSA_40
+quota 29m on TSA_40
+quota 23m on TD_152
+profile PRO_B31;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+IDENTIFIED  EXTERNALLY
+
+identified  externally
+用户验证方式为外部验证，
+2）⑦-- 配置文件指定为第3个，
+3）⑦-- 临时表空间设置为第3个临时表空间；
+4）⑦-- 缺省表空间设置为第2个表空间，
+5）⑦-- 在缺省表空间上可使用空间设置为12MB，
+
+
+
+6）⑦-- 外部验证用户总数为1，
+7）⑦-- 直接赋权给此用户，允许登录，
+8）⑦-- 以此用户登录数据库后再检测实验结果：
+9）⑦-- 此用户的会话信息数为1
+
+
+create user ops$administrator
+identified externally
+temporary tablespace TSSA_B
+default tablespace TD_152
+quota 12m on TD_152
+profile PRO_BA6;
+
+
+sqlplus /
+
+
+conn /@d_orcl
+
+grant connect to ops$administrator;
+grant create session to ops$administrator;
+col username for a30
+select username,default_tablespace,temporary_tablespace,authentication_type from dba_users where username like 'OPS$%';
+
+
